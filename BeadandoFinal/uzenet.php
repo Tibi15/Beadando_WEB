@@ -4,6 +4,53 @@
     //$_SESSION["isCheck"] = true;
     //$_SESSION["utvonal"] = strpos($_SERVER["REQUEST_URI"], "kepek.php");
     //header("Location: ./index.php");
+
+    $conn = mysqli_connect("localhost","root","","beadando");
+
+    if($_SERVER["REQUEST_METHOD"] == "POST")
+    {
+        if(isset($_POST["message"]) && isset($_POST["subject"]))
+        {
+            $targy = $_POST["subject"];
+            $uzenet = $_POST["message"];
+
+            $sql = "INSERT INTO uzenet(subject, message) VALUES('" . $targy . "', '" . $uzenet . "')";
+
+            $request = mysqli_query($conn,$sql);
+        }
+        
+        
+
+        /*
+        if($_SERVER["REQUEST_METHOD"] == "POST")
+        {
+            if(isset($_POST["email"]) && !empty($_POST["email"]) && isset($_POST["pw1"]) && !empty($_POST["pw1"]))
+            {
+                $email = $_POST["email"];
+                $pw1 = $_POST["pw1"];
+                $hashpw = md5($pw1);
+    
+                // email cím lekérdezése
+                $emailDb = "SELECT email FROM felhasznalok";
+                $emailRequest = mysqli_query($conn,$emailDb);
+    
+                // jelszó lekérdezése
+                $passwordDb = "SELECT jelszo FROM felhasznalok";
+                $passwordRequest = mysqli_query($conn,$passwordDb);
+    
+                // email címek eltárolása tömbben
+                if($resEm = $emailRequest){
+                    $userEm = [];
+                    while($rowEm = mysqli_fetch_object($resEm)){
+                        array_push($userEm, $rowEm->email);
+                    }
+                }
+            }
+        }
+        */
+
+
+    }
 ?>
 
 
@@ -34,6 +81,28 @@
         <?php
             include_once("navbar.php");
         ?>
+
+
+        <div class="clearfix">
+            <div style="display: inline;">
+                <h4 style="color: white; display: inline;">Tárgy:</h4>
+                <?php
+                    echo '<span style="color: white; font-size: 23px;">' . $targy . '</span>';
+                ?>
+                <br>
+                <br>
+            </div>
+            <div>
+                <!-- <fieldset style="background-color: grey;"> -->
+                <h4 style="color: white;">Üzenet:</h4>
+                <?php
+                    echo "<p>" . $uzenet . "</p>";
+                ?>
+                <!-- </fieldset> -->
+                
+            </div>
+        </div>
+
 
         <footer class="page-footer text-center wow fadeIn">
             <div class="py-5 bg-dark">

@@ -4,6 +4,85 @@
     //$_SESSION["isCheck"] = true;
     //$_SESSION["utvonal"] = strpos($_SERVER["REQUEST_URI"], "kepek.php");
     //header("Location: ./index.php");
+
+
+    /*
+    $subject_ok= true;
+    //$email_ok= true;
+    $message_ok= true;
+
+
+    if(!isset($_POST['subject']) || strlen($_POST['subject']) < 3)
+    {
+        $uzenet="A tárgy hibás próbálja újra!";
+        $subject_ok= false;
+    }
+
+    
+    $re = '/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/';
+    if(!isset($_POST['email']) || !preg_match($re,$_POST['email']))
+    {
+        $uzenet="Az e-mail hibás próbálja újra!";
+        $email_ok = false;
+    }
+    
+
+    if(!isset($_POST['message']) || empty($_POST['message']))
+    {
+        $uzenet="Az üzenet mező hibás próbálja újra!";
+        $message_ok = false;
+    }
+
+    if (isset($_POST['subject'])&&isset($_POST['message'])) {
+        //$email = $_POST['email'];
+        $subject = $_POST['subject'];
+        $message = $_POST['message'];
+
+        if (isset($_SESSION['login'])) {
+            $user = $_SESSION['login'];
+        } 
+        else {
+            $user = "Vendég";
+        }
+
+
+        if ($message_ok==true&&$subject_ok==true) {
+
+            try {
+                $dbh = new PDO('mysql:host=localhost;dbname=beadando', 'root', '', array(PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION));
+                $dbh->query('SET NAMES utf8 COLLATE utf8_hungarian_ci');
+                
+                $sqlInsert = "insert into uzenet(subject, message, user) values(:subject, :message, :user)";
+                $stmt = $dbh->prepare($sqlInsert); 
+                $stmt->execute(array(':subject' => $_POST['subject'],':message' => $_POST['message'],':user' => $user)); 
+                if($count = $stmt->rowCount()) {
+                    $newid = $dbh->lastInsertId();
+                    $uzenet = "Az üzenet elküldése sikerült.";                 
+                    $ujra = false;
+                }
+                
+                else{
+                    $uzenet="Az üzenetet nem sikerült elküldeni";
+                    $ujra = true;
+                }
+            }
+            catch (PDOException $e) {
+                $uzenet = "Hiba: ".$e->getMessage();
+                $ujra = true;
+            }  
+        }
+        else {
+            $uzenet="Az üzenetet nem sikerült elküldeni";
+            $ujra = true;
+        }
+            
+
+        }
+    else{
+            //header("Location:/beadando/email.php");
+    }
+    */
+
 ?>
 
 
@@ -39,14 +118,20 @@
 
         <div class="container">
             <div class="ujfelhasznalo">
-                <form method = "POST" action="" >
+                <form method = "POST" action="uzenet.php" >
 
                     <table>
                         <tr>
                             <td><p style="margin: 5px; padding: 5px; float: right;">Felhasználónév:</p></td>
+                            <td><p style="margin: 5px; padding: 5px; float: left;"></p></td>
                         </tr>
                         <tr>
                             <td><p style="margin: 5px; padding: 5px; float: right;">Név:</p></td>
+                            <td><p style="margin: 5px; padding: 5px; float: left;"></p></td>
+                        </tr>
+                        <tr>
+                            <td><p style="margin: 5px; padding: 5px; float: right;">Email:</p></td>
+                            <td><p style="margin: 5px; padding: 5px; float: left;"></p></td>
                         </tr>
                     </table>
                     
@@ -55,17 +140,25 @@
                     <div style="margin-top: 20px;">
                         <h2>Email</h2> <!--<label class="labella">Regisztráció</label><br />-->
                     </div>
+
+                    <div>
+                        <p><span>Tárgy:</span><span><input type="text" name="subject" id="subject"></span></p>
+                    </div>
                     
                     <div>
-                        <label for="uzenet" class="labella" style="margin: 10px;">Üzenet:</label><br />
+                        <label for="message" class="labella" style="margin: 10px;">Üzenet:</label><br />
                         
                     </div>
 
-                    <textarea id="uzenet" name="uzenet" rows="6" cols="50" placeholder="Írj üzenetet!"></textarea>
+                    <textarea id="message" name="message" rows="6" cols="50" placeholder="Írj üzenetet!"></textarea>
                     <!-- <input type="email" class="bevitel" name="uzenet" id="uzenet" placeholder="Írj üzenetet!"> -->
 
                     <br />
-                    <input type="submit" class="btn btn-primary" style="margin: 10px;" value="Elküld!">
+                    <a href="uzenet.php" target="_blank">
+                        <input type="submit" formtarget="_blank" class="btn btn-primary" style="margin: 10px;" value="Elküld!">
+                        <!-- <input type="button" class="btn btn-primary" style="margin: 10px;" value="Elküld!"> -->
+                    </a>
+                    
                     <br />
                     <br />
                     <!-- <a class="btn btn-primary" href="regisztracio.php">Regisztrálok!</a> -->

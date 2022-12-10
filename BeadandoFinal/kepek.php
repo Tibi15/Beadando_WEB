@@ -4,6 +4,58 @@
     //$_SESSION["isCheck"] = true;
     //$_SESSION["utvonal"] = strpos($_SERVER["REQUEST_URI"], "kepek.php");
     //header("Location: ./index.php");
+
+    $MAPPA = './kepek/';
+    $TIPUSOK = array ('.jpg', '.png');
+    $MEDIATIPUSOK = array('image/jpeg', 'image/png');
+    $DATUMFORMA = "Y.m.d. H:i";
+    $MAXMERET = 1000000000000000000000000*1000000000000000000000000;
+
+
+    $uzenet = array();   
+
+    if(isset($_SESSION['login'])){
+
+        if (isset($_POST['kuld'])) {
+        
+            $fajlok = $_FILES["fajlok"];
+            for($i = 0; $i < count($fajlok["name"]); $i++) {
+                if ($fajlok['error'][$i] == 4)    
+                    $uzenet[] = "Nem töltött fel fájlt";
+                elseif ($fajlok['error'][$i] == 1   
+                            or $fajlok['error'][$i] == 2  
+                            or $fajlok['size'][$i] > $MAXMERET) 
+                    $uzenet[] = " Túl nagy állomány: " . $fajlok['name'][$i];
+                elseif (!in_array($fajlok['type'][$i], $MEDIATIPUSOK))
+                    $uzenet[] = " Nem megfelelő típus: " . $fajlok['name'][$i];
+                else {
+                    $vegsohely = $MAPPA.strtolower($fajlok['name'][$i]);
+                    if (file_exists($vegsohely))
+                        $uzenet[] = " Már létezik: " . $fajlok['name'][$i];
+                    else {
+                        move_uploaded_file($fajlok['tmp_name'][$i], $vegsohely);
+                        $uzenet[] = ' Sikeres fajl feltöltés: ' . $fajlok['name'][$i];
+                    }
+                }
+            }        
+        }
+    }
+    else{
+        $uzenet[] = 'Feltőltés csak bejelentkezés után lehetséges.';
+    }
+       
+    $kepek = array();
+    $olvaso = opendir($MAPPA);
+    while (($fajl = readdir($olvaso)) !== false) {
+        if (is_file($MAPPA.$fajl)) {
+            $vege = strtolower(substr($fajl, strlen($fajl)-4));
+            if (in_array($vege, $TIPUSOK)) {
+                $kepek[$fajl] = filemtime($MAPPA.$fajl);
+            }
+        }
+    }
+    closedir($olvaso);
+
 ?>
 
 
@@ -35,12 +87,51 @@
             include_once("navbar.php");
         ?>
 
+        <!--
         <div>
             <p style="float: left;">Képfeltöltés:</p>
-            <!-- <label for="myfile">Select a file:</label> -->
+            <label for="myfile">Select a file:</label>
             <input type="file" id="myfile" name="myfile"  style="margin: 2rem; padding-top: 1rem; padding-bottom: 1rem;">
         </div>
-        
+        -->
+
+        <form id="kapcsolat" action="#" method="post" enctype="multipart/form-data">
+
+            <input  type="hidden" name="max_file_size" value="110000">
+
+            <p>
+                <label for="file-upload" class="custom-file-upload">Fájlok kiválasztása
+                    <input  id="file-upload" type="file" name="fajlok[]" accept="image/png, image/jpeg" multiple required>
+                </label>
+                <input class="btn2" type="submit" name="kuld">
+            </p>
+
+        </form>
+
+        <?php
+            if (!empty($uzenet))
+            {
+                echo '<ul style="color: white; list-style-type: none;">';
+                foreach($uzenet as $u)
+                    echo "<li>$u</li>";
+                echo '</ul>';
+            }
+        ?>
+
+        <?php
+            arsort($kepek);
+            foreach($kepek as $fajl => $datum)
+            {
+        ?>
+            <div class="kep">
+                <a href="<?php echo $MAPPA.$fajl ?>" target="_blank">
+                    <img src="<?php echo $MAPPA.$fajl ?>" style="width: 300px; height: 300px;">
+                </a>            
+            </div>
+            <br>
+        <?php
+            }
+        ?>
         
         <footer class="page-footer text-center wow fadeIn">
             <div class="py-5 bg-dark">
